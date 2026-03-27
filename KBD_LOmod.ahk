@@ -16,14 +16,8 @@ global numpad_decimal_mode := true
 NumpadDot:: Send "."
 #HotIf
 
-; Addition for laptops w/o media fn-keys: Media playback controls
-; OS-key + Alt + arrow keys
-#!Left::Send("{Media_Prev}")
-#!Right::Send("{Media_Next}")
-#!Down::Send("{Media_Play_Pause}")
-
 ; Additional input mode for remapping ö and ä to {} and ü to \
-; Toggle via AltGr + ü, set to on by default.
+; Toggle via AltGr + ü, set to true/ enabled by default
 global coding_mode := true
 <^>!ü:: {
     global coding_mode
@@ -34,3 +28,27 @@ global coding_mode := true
 ä:: Send "{}}"
 ü:: Send "\"
 #HotIf
+
+; Below are utility additions:
+
+; Addition for laptops w/o media fn-keys: Media playback controls
+; OS-key + Alt + arrow keys
+#!Left::Send("{Media_Prev}")
+#!Right::Send("{Media_Next}")
+#!Down::Send("{Media_Play_Pause}")
+
+; Taskbar toggle key via OS key + space
+#Space:: ToggleTaskbar()
+ToggleTaskbar() {
+    static hide := false
+    static ABM_SETSTATE := 0xA
+    static ABS_AUTOHIDE := 0x1
+    static ABS_ALWAYSONTOP := 0x2
+    hide := !hide
+    size := 2*A_PtrSize + 2*4 + 16 + A_PtrSize
+    APPBARDATA := Buffer(size, 0)
+    NumPut("UInt", size, APPBARDATA, 0)
+    NumPut("Ptr", WinExist("ahk_class Shell_TrayWnd"), APPBARDATA, A_PtrSize)
+    NumPut("Ptr", hide ? ABS_AUTOHIDE : ABS_ALWAYSONTOP, APPBARDATA, size - A_PtrSize)
+    DllCall("Shell32\SHAppBarMessage", "UInt", ABM_SETSTATE, "Ptr", APPBARDATA)
+}
