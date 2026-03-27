@@ -1,9 +1,20 @@
 ﻿#Requires AutoHotkey v2.0
+; Meant for use with German keyboards
 
-; Replaces ' with #
-NumpadDot:: Send "."
+; Switches ' with #
 #::'
 +':: Send "{#}"
+
+; Replaces numpad comma with a dot (non-numpad keys not affected)
+; Toggle back via AltGr + ä if needed, set to dot by default.
+global numpad_decimal_mode := true
+<^>!ä:: {
+    global numpad_decimal_mode
+    numpad_decimal_mode := !numpad_decimal_mode
+}
+#HotIf (numpad_decimal_mode= true)
+NumpadDot:: Send "."
+#HotIf
 
 ; Addition for laptops w/o media fn-keys: Media playback controls
 ; OS-key + Alt + arrow keys
@@ -12,13 +23,13 @@ NumpadDot:: Send "."
 #!Down::Send("{Media_Play_Pause}")
 
 ; Additional input mode for remapping ö and ä to {} and ü to \
-; Toggle via AltGr+ü, set to on by default.
-global mode_1Enabled := true
+; Toggle via AltGr + ü, set to on by default.
+global coding_mode := true
 <^>!ü:: {
-    global mode_1Enabled
-    mode_1Enabled := !mode_1Enabled
+    global coding_mode
+    coding_mode := !coding_mode
 }
-#HotIf (mode_1Enabled= true)
+#HotIf (coding_mode= true)
 ö:: Send "{{}"
 ä:: Send "{}}"
 ü:: Send "\"
