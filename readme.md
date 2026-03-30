@@ -7,15 +7,22 @@ AHK v2 script with utility additions for German keyboards.
 ### Layout fixes
 - **# / ' swap** — `#` outputs `'` by default and vice versa
 - **Numpad decimal** — NumpadDot outputs `.` instead of `,`, on by default (toggle anytime: `AltGr+ä`)
-- **Coding mode** — `ö` → `{`, `ä` → `}`, `ü` → `\`, on by default (toggle anytime: `AltGr+ü`)
+- **Coding mode** — off by default, toggle anytime via `AltGr+ü`
+  - `ö` → `{`, `Ö` → `[`
+  - `ä` → `}`, `Ä` → `]`
+  - `ü` → `~`, `Ü` → `&`
+  - `ß` → `\`
 
 ### Utilities
 - **Media keys** — `Win+Alt+←/→/↓` for previous/next/play-pause, for laptops without dedicated media keys
 - **Taskbar toggle** — `Win+Space` toggles taskbar auto-hide on/off via Windows AppBar API, no Explorer restart required
 
+### Tray menu
+Right-clicking the tray icon allows toggling coding mode and numpad decimal mode directly, with checkmarks reflecting the current state.
+
 ## Setup
 
-No AHK installation required — use the compiled `KBD_LOmod.exe` directly. Alternatively compile ahk source code yourself. Requires Autohotkey 2.0
+No AHK installation required — use the compiled `KBD_LOmod.exe` directly. Alternatively compile the AHK source yourself. Requires AutoHotkey 2.0.
 
 To run on startup:
 1. Press `Win+R` and type `shell:startup`
