@@ -1,5 +1,5 @@
 ﻿#Requires AutoHotkey v2.0
-; Meant for use with German keyboards
+; --- Main remappings/ modes:
 
 ; Switches ' with #
 #::'
@@ -11,25 +11,32 @@ global numpad_decimal_mode := true
 <^>!ä:: {
     global numpad_decimal_mode
     numpad_decimal_mode := !numpad_decimal_mode
+    numpad_decimal_mode ? A_TrayMenu.Check("Numpad Decimal Mode") : A_TrayMenu.Uncheck("Numpad Decimal Mode")
 }
 #HotIf (numpad_decimal_mode= true)
 NumpadDot:: Send "."
 #HotIf
 
-; Additional input mode for remapping ö and ä to {} and ü to \
-; Toggle via AltGr + ü, set to true/ enabled by default
-global coding_mode := true
+; Additional input mode for remapping ö and ä to {} and ü to ~
+; Uppercase Ö, Ä and Ü are remapped to [, ] and &
+; Toggle via AltGr + ü, set to false/ disabled by default
+global coding_mode := false
 <^>!ü:: {
     global coding_mode
     coding_mode := !coding_mode
+    coding_mode ? A_TrayMenu.Check("Coding Mode") : A_TrayMenu.Uncheck("Coding Mode")
 }
 #HotIf (coding_mode= true)
 ö:: Send "{{}"
+Ö:: Send "["
 ä:: Send "{}}"
-ü:: Send "\"
+Ä:: Send "]"
+ü:: Send "~"
+Ü:: Send "&"
+ß:: Send "\"
 #HotIf
 
-; Below are utility additions:
+; --- Below are utility additions:
 
 ; Addition for laptops w/o media fn-keys: Media playback controls
 ; OS-key + Alt + arrow keys
@@ -51,4 +58,24 @@ ToggleTaskbar() {
     NumPut("Ptr", WinExist("ahk_class Shell_TrayWnd"), APPBARDATA, A_PtrSize)
     NumPut("Ptr", hide ? ABS_AUTOHIDE : ABS_ALWAYSONTOP, APPBARDATA, size - A_PtrSize)
     DllCall("Shell32\SHAppBarMessage", "UInt", ABM_SETSTATE, "Ptr", APPBARDATA)
+}
+
+; --- Tray indicators and mode selectors
+A_TrayMenu.Delete()
+A_TrayMenu.Add("Coding Mode", ToggleCodingMode)
+A_TrayMenu.Add("Numpad Decimal Mode", ToggleNumpadMode)
+A_TrayMenu.Add()
+A_TrayMenu.Add("Exit", (*) => ExitApp())
+A_TrayMenu.Check("Numpad Decimal Mode")
+
+ToggleCodingMode(*) {
+    global coding_mode
+    coding_mode := !coding_mode
+    coding_mode ? A_TrayMenu.Check("Coding Mode") : A_TrayMenu.Uncheck("Coding Mode")
+}
+
+ToggleNumpadMode(*) {
+    global numpad_decimal_mode
+    numpad_decimal_mode := !numpad_decimal_mode
+    numpad_decimal_mode ? A_TrayMenu.Check("Numpad Decimal Mode") : A_TrayMenu.Uncheck("Numpad Decimal Mode")
 }
