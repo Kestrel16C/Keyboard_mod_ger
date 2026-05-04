@@ -36,6 +36,20 @@ global coding_mode := false
 ß:: Send "\"
 #HotIf
 
+; shift + WASD to arrow key remap toggle
+global wasd_to_arrow := true
+<^>!ö:: {
+    global wasd_to_arrow
+    wasd_to_arrow := !wasd_to_arrow
+    wasd_to_arrow ? A_TrayMenu.Check("WASD to Arrow mode") : A_TrayMenu.Uncheck("WASD to Arrow mode")
+}
+#HotIf (wasd_to_arrow= true)
++W:: Send "Up"
++S:: Send "Down"
++A:: Send "Left"
++D:: Send "Right"
+#HotIf
+
 ; --- Below are utility additions:
 
 ; Addition for laptops w/o media fn-keys: Media playback controls
@@ -64,6 +78,7 @@ ToggleTaskbar() {
 A_TrayMenu.Delete()
 A_TrayMenu.Add("Coding Mode", ToggleCodingMode)
 A_TrayMenu.Add("Numpad Decimal Mode", ToggleNumpadMode)
+A_TrayMenu.Add("WASD to Arrow mode", wasd_to_arrow)
 A_TrayMenu.Add()
 A_TrayMenu.Add("Exit", (*) => ExitApp())
 A_TrayMenu.Check("Numpad Decimal Mode")
@@ -72,6 +87,12 @@ ToggleCodingMode(*) {
     global coding_mode
     coding_mode := !coding_mode
     coding_mode ? A_TrayMenu.Check("Coding Mode") : A_TrayMenu.Uncheck("Coding Mode")
+}
+
+wasd_to_arrow(*) {
+    global wasd_to_arrow
+    wasd_to_arrow := !wasd_to_arrow
+    wasd_to_arrow ? A_TrayMenu.Check("WASD to Arrow mode") : A_TrayMenu.Uncheck("Coding Mode")
 }
 
 ToggleNumpadMode(*) {
