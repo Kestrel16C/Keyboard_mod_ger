@@ -1,16 +1,22 @@
 ﻿#Requires AutoHotkey v2.0
-; --- Main remappings/ modes:
 
-; Switches ' with #
+; --- Config loading
+ConfigFile := A_ScriptDir "\kbd_mod.cfg"
+
+; Defaults (used if .cfg is missing entries or the file doesn't exist)
+global numpad_decimal_mode := IniRead(ConfigFile, "Defaults", "NumpadDecimalMode", "1") = "1"
+global coding_mode         := IniRead(ConfigFile, "Defaults", "CodingMode",         "0") = "1"
+global wasd_to_arrow       := IniRead(ConfigFile, "Defaults", "WASDToArrowMode",    "1") = "1"
+
+ToggleNumpadHotkey := IniRead(ConfigFile, "Hotkeys", "ToggleNumpadDecimal", "<^>!ä")
+ToggleCodingHotkey := IniRead(ConfigFile, "Hotkeys", "ToggleCoding",        "<^>!ü")
+ToggleWASDHotkey   := IniRead(ConfigFile, "Hotkeys", "ToggleWASD",          "<^>!ö")
+
+; --- Switches ' with #
 #::'
-+':: Send "{#}"
++'::Send "{#}"
 
-; --- Mode state (defaults)
-global numpad_decimal_mode := true
-global coding_mode := false
-global wasd_to_arrow := true
-
-; --- Toggle functions (single source of truth for state + tray check)
+; --- Toggle functions
 ToggleNumpadMode(*) {
     global numpad_decimal_mode
     numpad_decimal_mode := !numpad_decimal_mode
@@ -29,45 +35,47 @@ ToggleWASD(*) {
     wasd_to_arrow ? A_TrayMenu.Check("WASD to Arrow Mode") : A_TrayMenu.Uncheck("WASD to Arrow Mode")
 }
 
-; --- Mode toggle hotkeys (route through the same function as the tray menu)
-<^>!ä::ToggleNumpadMode()
-<^>!ü::ToggleCodingMode()
-<^>!ö::ToggleWASD()
+; --- Register toggle hotkeys from config
+try Hotkey(ToggleNumpadHotkey, ToggleNumpadMode)
+catch as e
+    MsgBox "Invalid hotkey for ToggleNumpadDecimal: " ToggleNumpadHotkey "`n" e.Message
 
-; --- Numpad: replaces numpad comma with a dot (non-numpad keys not affected)
+try Hotkey(ToggleCodingHotkey, ToggleCodingMode)
+catch as e
+    MsgBox "Invalid hotkey for ToggleCoding: " ToggleCodingHotkey "`n" e.Message
+
+try Hotkey(ToggleWASDHotkey, ToggleWASD)
+catch as e
+    MsgBox "Invalid hotkey for ToggleWASD: " ToggleWASDHotkey "`n" e.Message
+
+; --- Mode-conditional remaps (unchanged)
 #HotIf numpad_decimal_mode
-NumpadDot:: Send "."
+NumpadDot::Send "."
 #HotIf
 
-; --- Coding mode: ö/ä → {}, ü → ~, Ö/Ä → [], Ü → &, ß → \
 #HotIf coding_mode
-ö:: Send "{{}"
-Ö:: Send "["
-ä:: Send "{}}"
-Ä:: Send "]"
-ü:: Send "/"
-Ü:: Send "&"
-ß:: Send "\"
+ö::Send "{{}"
+Ö::Send "["
+ä::Send "{}}"
+Ä::Send "]"
+ü::Send "~"
+Ü::Send "&"
+ß::Send "\"
 #HotIf
 
-; --- Alt + WASD as arrow keys
 #HotIf wasd_to_arrow
-!w:: Send "{Up}"
-!s:: Send "{Down}"
-!a:: Send "{Left}"
-!d:: Send "{Right}"
+!w::Send "{Up}"
+!s::Send "{Down}"
+!a::Send "{Left}"
+!d::Send "{Right}"
 #HotIf
 
-; --- Below are utility additions:
-
-; Media playback controls for laptops w/o media fn-keys
-; Win + Alt + arrow keys
+; --- Utility hotkeys (unchanged)
 #!Left::Send("{Media_Prev}")
 #!Right::Send("{Media_Next}")
 #!Down::Send("{Media_Play_Pause}")
 
-; Taskbar toggle via Win + Space
-#Space:: ToggleTaskbar()
+#Space::ToggleTaskbar()
 ToggleTaskbar() {
     static hide := false
     static ABM_SETSTATE := 0xA
@@ -82,7 +90,7 @@ ToggleTaskbar() {
     DllCall("Shell32\SHAppBarMessage", "UInt", ABM_SETSTATE, "Ptr", APPBARDATA)
 }
 
-; --- Tray indicators and mode selectors
+; --- Tray menu
 A_TrayMenu.Delete()
 A_TrayMenu.Add("Coding Mode", ToggleCodingMode)
 A_TrayMenu.Add("Numpad Decimal Mode", ToggleNumpadMode)
@@ -91,7 +99,6 @@ A_TrayMenu.Add()
 A_TrayMenu.Add("Reload", (*) => Reload())
 A_TrayMenu.Add("Exit", (*) => ExitApp())
 
-; Initial check state derived from variables, not hardcoded strings
 if numpad_decimal_mode
     A_TrayMenu.Check("Numpad Decimal Mode")
 if coding_mode
