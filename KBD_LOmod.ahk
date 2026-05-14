@@ -58,7 +58,7 @@ NumpadDot::Send "."
 Ö::Send "["
 ä::Send "{}}"
 Ä::Send "]"
-ü::Send "~"
+ü::Send "/"
 Ü::Send "&"
 ß::Send "\"
 #HotIf
@@ -70,7 +70,7 @@ NumpadDot::Send "."
 !d::Send "{Right}"
 #HotIf
 
-; --- Utility hotkeys (unchanged)
+; --- Utility hotkeys
 #!Left::Send("{Media_Prev}")
 #!Right::Send("{Media_Next}")
 #!Down::Send("{Media_Play_Pause}")
