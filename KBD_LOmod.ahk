@@ -5,28 +5,42 @@
 #::'
 +':: Send "{#}"
 
-; Replaces numpad comma with a dot (non-numpad keys not affected)
-; Toggle back via AltGr + ä if needed, set to dot by default.
+; --- Mode state (defaults)
 global numpad_decimal_mode := true
-<^>!ä:: {
+global coding_mode := false
+global wasd_to_arrow := true
+
+; --- Toggle functions (single source of truth for state + tray check)
+ToggleNumpadMode(*) {
     global numpad_decimal_mode
     numpad_decimal_mode := !numpad_decimal_mode
     numpad_decimal_mode ? A_TrayMenu.Check("Numpad Decimal Mode") : A_TrayMenu.Uncheck("Numpad Decimal Mode")
 }
-#HotIf (numpad_decimal_mode= true)
-NumpadDot:: Send "."
-#HotIf
 
-; Additional input mode for remapping ö and ä to {} and ü to ~
-; Uppercase Ö, Ä and Ü are remapped to [, ] and &
-; Toggle via AltGr + ü, set to false/ disabled by default
-global coding_mode := false
-<^>!ü:: {
+ToggleCodingMode(*) {
     global coding_mode
     coding_mode := !coding_mode
     coding_mode ? A_TrayMenu.Check("Coding Mode") : A_TrayMenu.Uncheck("Coding Mode")
 }
-#HotIf (coding_mode= true)
+
+ToggleWASD(*) {
+    global wasd_to_arrow
+    wasd_to_arrow := !wasd_to_arrow
+    wasd_to_arrow ? A_TrayMenu.Check("WASD to Arrow Mode") : A_TrayMenu.Uncheck("WASD to Arrow Mode")
+}
+
+; --- Mode toggle hotkeys (route through the same function as the tray menu)
+<^>!ä::ToggleNumpadMode()
+<^>!ü::ToggleCodingMode()
+<^>!ö::ToggleWASD()
+
+; --- Numpad: replaces numpad comma with a dot (non-numpad keys not affected)
+#HotIf numpad_decimal_mode
+NumpadDot:: Send "."
+#HotIf
+
+; --- Coding mode: ö/ä → {}, ü → ~, Ö/Ä → [], Ü → &, ß → \
+#HotIf coding_mode
 ö:: Send "{{}"
 Ö:: Send "["
 ä:: Send "{}}"
@@ -36,29 +50,23 @@ global coding_mode := false
 ß:: Send "\"
 #HotIf
 
-; shift + WASD to arrow key remap toggle
-global wasd_to_arrow := true
-<^>!ö:: {
-    global wasd_to_arrow
-    wasd_to_arrow := !wasd_to_arrow
-    wasd_to_arrow ? A_TrayMenu.Check("WASD to Arrow mode") : A_TrayMenu.Uncheck("WASD to Arrow mode")
-}
-#HotIf (wasd_to_arrow= true)
-+W:: Send "Up"
-+S:: Send "Down"
-+A:: Send "Left"
-+D:: Send "Right"
+; --- Alt + WASD as arrow keys
+#HotIf wasd_to_arrow
+!w:: Send "{Up}"
+!s:: Send "{Down}"
+!a:: Send "{Left}"
+!d:: Send "{Right}"
 #HotIf
 
 ; --- Below are utility additions:
 
-; Addition for laptops w/o media fn-keys: Media playback controls
-; OS-key + Alt + arrow keys
+; Media playback controls for laptops w/o media fn-keys
+; Win + Alt + arrow keys
 #!Left::Send("{Media_Prev}")
 #!Right::Send("{Media_Next}")
 #!Down::Send("{Media_Play_Pause}")
 
-; Taskbar toggle key via OS key + space
+; Taskbar toggle via Win + Space
 #Space:: ToggleTaskbar()
 ToggleTaskbar() {
     static hide := false
@@ -78,25 +86,15 @@ ToggleTaskbar() {
 A_TrayMenu.Delete()
 A_TrayMenu.Add("Coding Mode", ToggleCodingMode)
 A_TrayMenu.Add("Numpad Decimal Mode", ToggleNumpadMode)
-A_TrayMenu.Add("WASD to Arrow mode", wasd_to_arrow)
+A_TrayMenu.Add("WASD to Arrow Mode", ToggleWASD)
 A_TrayMenu.Add()
+A_TrayMenu.Add("Reload", (*) => Reload())
 A_TrayMenu.Add("Exit", (*) => ExitApp())
-A_TrayMenu.Check("Numpad Decimal Mode")
 
-ToggleCodingMode(*) {
-    global coding_mode
-    coding_mode := !coding_mode
-    coding_mode ? A_TrayMenu.Check("Coding Mode") : A_TrayMenu.Uncheck("Coding Mode")
-}
-
-wasd_to_arrow(*) {
-    global wasd_to_arrow
-    wasd_to_arrow := !wasd_to_arrow
-    wasd_to_arrow ? A_TrayMenu.Check("WASD to Arrow mode") : A_TrayMenu.Uncheck("Coding Mode")
-}
-
-ToggleNumpadMode(*) {
-    global numpad_decimal_mode
-    numpad_decimal_mode := !numpad_decimal_mode
-    numpad_decimal_mode ? A_TrayMenu.Check("Numpad Decimal Mode") : A_TrayMenu.Uncheck("Numpad Decimal Mode")
-}
+; Initial check state derived from variables, not hardcoded strings
+if numpad_decimal_mode
+    A_TrayMenu.Check("Numpad Decimal Mode")
+if coding_mode
+    A_TrayMenu.Check("Coding Mode")
+if wasd_to_arrow
+    A_TrayMenu.Check("WASD to Arrow Mode")
