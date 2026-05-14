@@ -45,7 +45,7 @@ NumpadDot:: Send "."
 Ö:: Send "["
 ä:: Send "{}}"
 Ä:: Send "]"
-ü:: Send "~"
+ü:: Send "/"
 Ü:: Send "&"
 ß:: Send "\"
 #HotIf
