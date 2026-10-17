@@ -8,9 +8,9 @@ AHK v2 script with utility additions for German keyboards.
 - **# / ' swap** — `#` outputs `'` by default and vice versa
 - **Numpad decimal** — NumpadDot outputs `.` instead of `,`, on by default (toggle anytime: `AltGr+ä`)
 - **Coding mode** — off by default, toggle anytime via `AltGr+ü`
-  - `ö` → `{`, `Ö` → `[`
-  - `ä` → `}`, `Ä` → `]`
-  - `ü` → `~`, `Ü` → `&`
+  - `ö` → `[`, `Ö` → `{`
+  - `ä` → `]`, `Ä` → `}`
+  - `ü` → `/`, `Ü` → `&`
   - `ß` → `\`
 
 ### Utilities

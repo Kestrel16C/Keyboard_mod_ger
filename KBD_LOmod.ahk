@@ -5,7 +5,7 @@ ConfigFile := A_ScriptDir "\kbd_mod.cfg"
 
 ; Defaults (used if .cfg is missing entries or the file doesn't exist)
 global numpad_decimal_mode := IniRead(ConfigFile, "Defaults", "NumpadDecimalMode", "1") = "1"
-global coding_mode         := IniRead(ConfigFile, "Defaults", "CodingMode",         "0") = "1"
+global coding_mode         := IniRead(ConfigFile, "Defaults", "CodingMode",         "1") = "1"
 global wasd_to_arrow       := IniRead(ConfigFile, "Defaults", "WASDToArrowMode",    "1") = "1"
 
 ToggleNumpadHotkey := IniRead(ConfigFile, "Hotkeys", "ToggleNumpadDecimal", "<^>!ä")
@@ -48,16 +48,16 @@ try Hotkey(ToggleWASDHotkey, ToggleWASD)
 catch as e
     MsgBox "Invalid hotkey for ToggleWASD: " ToggleWASDHotkey "`n" e.Message
 
-; --- Mode-conditional remaps (unchanged)
+; --- Mode-conditional remaps
 #HotIf numpad_decimal_mode
 NumpadDot::Send "."
 #HotIf
 
 #HotIf coding_mode
-ö::Send "{{}"
-Ö::Send "["
-ä::Send "{}}"
-Ä::Send "]"
+ö::Send "["
+Ö::Send "{{}"
+ä::Send "]"
+Ä::Send "{}}"
 ü::Send "/"
 Ü::Send "&"
 ß::Send "\"
